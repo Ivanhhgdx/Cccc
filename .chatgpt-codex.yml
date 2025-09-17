@@ -1,0 +1,4 @@
+version: 1
+tasks:
+  build: echo "No build step"
+  test: echo "No tests"
