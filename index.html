@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Air-Hands Studio</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <video id="camera" class="camera-feed" autoplay playsinline muted></video>
+      <canvas id="scene3d" class="scene-layer"></canvas>
+      <canvas id="draw-layer" class="draw-layer"></canvas>
+      <div id="ui-layer" class="ui-layer">
+        <header class="top-bar glass-panel">
+          <div class="brand">
+            <img src="assets/logo.svg" alt="Air Hands Studio" />
+            <span>Air-Hands Studio</span>
+          </div>
+          <div class="controls">
+            <label class="control">
+              <span>Camera</span>
+              <select id="camera-select"></select>
+            </label>
+            <label class="control">
+              <span>Quality</span>
+              <select id="quality-select">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>FPS</span>
+              <select id="fps-select">
+                <option value="15">15</option>
+                <option value="24">24</option>
+                <option value="30" selected>30</option>
+              </select>
+            </label>
+            <div class="status">
+              <span id="status-hands">Hands: 0</span>
+              <span id="status-latency">Latency: --</span>
+              <span id="status-fps">FPS: --</span>
+            </div>
+          </div>
+        </header>
+        <aside class="side-panel left glass-panel" id="scene-panel">
+          <h2>3D Scene</h2>
+          <div class="panel-group">
+            <label class="control">
+              <span>Object</span>
+              <select id="shape-select">
+                <option value="cube">Cube</option>
+                <option value="sphere">Sphere</option>
+                <option value="torus">Torus</option>
+                <option value="icosahedron">Icosahedron</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>Material</span>
+              <select id="material-select">
+                <option value="glass">Glass</option>
+                <option value="metal" selected>Metal</option>
+                <option value="matte">Matte</option>
+              </select>
+            </label>
+            <label class="control">
+              <span>Metalness</span>
+              <input type="range" id="metalness" min="0" max="1" step="0.01" value="0.7" />
+            </label>
+            <label class="control">
+              <span>Roughness</span>
+              <input type="range" id="roughness" min="0" max="1" step="0.01" value="0.25" />
+            </label>
+            <label class="control toggle">
+              <span>Shadows</span>
+              <input type="checkbox" id="shadows-toggle" checked />
+            </label>
+            <button id="reset-pose" class="primary">Reset pose</button>
+          </div>
+        </aside>
+        <aside class="side-panel right glass-panel" id="drawing-panel">
+          <h2>Drawing</h2>
+          <div class="panel-group">
+            <label class="control">
+              <span>Color</span>
+              <input type="color" id="color-picker" value="#ff3b81" />
+            </label>
+            <label class="control">
+              <span>Opacity</span>
+              <input type="range" id="opacity" min="0.1" max="1" step="0.05" value="0.9" />
+            </label>
+            <label class="control">
+              <span>Thickness</span>
+              <input type="range" id="thickness" min="1" max="30" step="1" value="8" />
+            </label>
+            <label class="control">
+              <span>Brush</span>
+              <select id="brush-select">
+                <option value="solid" selected>Solid</option>
+                <option value="marker">Marker</option>
+                <option value="neon">Neon</option>
+              </select>
+            </label>
+            <div class="button-group">
+              <button id="undo" class="secondary">Undo</button>
+              <button id="redo" class="secondary">Redo</button>
+              <button id="clear" class="danger">Clear</button>
+            </div>
+            <button id="toggle-eraser" class="secondary">Eraser</button>
+            <button id="screenshot" class="secondary">Screenshot</button>
+          </div>
+        </aside>
+        <footer class="bottom-bar glass-panel" id="gestures-help">
+          <button id="toggle-help" class="secondary">Gestures</button>
+          <div class="help-cards">
+            <div class="help-card">
+              <span class="icon">🤏</span>
+              <span>Pinch to draw</span>
+            </div>
+            <div class="help-card">
+              <span class="icon">✌️</span>
+              <span>Double pinch → eraser</span>
+            </div>
+            <div class="help-card">
+              <span class="icon">👐</span>
+              <span>Open palm → panels</span>
+            </div>
+            <div class="help-card">
+              <span class="icon">👊</span>
+              <span>Fist → pause camera</span>
+            </div>
+            <div class="help-card">
+              <span class="icon">👍</span>
+              <span>Thumbs-up → screenshot</span>
+            </div>
+            <div class="help-card">
+              <span class="icon">👐👐</span>
+              <span>Two pinches → scale &amp; move</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+      <div id="fallback" class="fallback hidden">
+        <div class="fallback-card glass-panel">
+          <h2>No camera access</h2>
+          <p>
+            We could not access your camera. Try granting permissions or use demo mode
+            below to explore the interface.
+          </p>
+          <div class="demo-controls">
+            <label class="control">
+              <span>Rotate</span>
+              <input id="demo-rotate" type="range" min="-180" max="180" value="0" />
+            </label>
+            <label class="control">
+              <span>Scale</span>
+              <input id="demo-scale" type="range" min="0.5" max="2" step="0.01" value="1" />
+            </label>
+            <label class="control">
+              <span>Draw opacity</span>
+              <input id="demo-opacity" type="range" min="0" max="1" step="0.05" value="0.8" />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="quick-help" class="quick-help hidden glass-panel">
+        <h2>Quick Gestures</h2>
+        <ul>
+          <li>Pinch (index + thumb) to draw, release to stop.</li>
+          <li>Double pinch to toggle pen and eraser.</li>
+          <li>Two pinches with both hands to scale or move the 3D object.</li>
+          <li>Hold open palm for 1 second to open this help.</li>
+          <li>Thumbs up takes a screenshot of the current scene.</li>
+        </ul>
+        <button id="close-help" class="secondary">Close</button>
+      </div>
+    </div>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
